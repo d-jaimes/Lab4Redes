@@ -11,6 +11,8 @@ public class ThreadServidor extends Thread {
 
 	public final static String PATH = "c:/datosRedes/";  //Nombre y ubicación del archivo enviado.
 
+	public final static int MESSAGE_SIZE = 256;  //Tamaño de los paquetes enviados.
+
 
 	private Socket socket = null;
 
@@ -59,7 +61,7 @@ public class ThreadServidor extends Thread {
 
 		try {
 			//Inicio Comunicación
-			escritor.println("Ingrese el nombre del archivo que desea descargar");
+			escritor.println("Please write the name of the file you want to download:");
 			String nombreArchivo = lector.readLine();
 
 
@@ -75,7 +77,24 @@ public class ThreadServidor extends Thread {
 
 			os = socket.getOutputStream();
 			System.out.println("Sending " + PATH + nombreArchivo + "(" + myByteArray.length + " bytes)");
-			os.write(myByteArray, 0, myByteArray.length);
+
+			int bytesEnviados = 0;
+
+			while(bytesEnviados < myByteArray.length) {
+				if((bytesEnviados + MESSAGE_SIZE) < myByteArray.length) {
+					os.write(myByteArray, bytesEnviados, MESSAGE_SIZE);
+					bytesEnviados += MESSAGE_SIZE;
+				}
+				else {
+					int faltaPorEnviar = myByteArray.length - bytesEnviados;
+					os.write(myByteArray, bytesEnviados, faltaPorEnviar);
+					bytesEnviados += faltaPorEnviar;
+				}
+
+
+			}
+
+			//os.write(myByteArray, 0, myByteArray.length);
 			os.flush();
 			System.out.println("Done.");
 
