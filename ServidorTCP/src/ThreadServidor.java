@@ -6,6 +6,7 @@ public class ThreadServidor extends Thread {
 	// public final static String PATH = "C:\\Users\\Asus-PC\\Desktop\\University\\6Semestre\\Redes\\docs";  //Nombre y ubicación del archivo enviado.
 
 	public final static int MESSAGE_SIZE = 256;  //Tamaño de los paquetes enviados.
+	public  final static int TAM_BUFFER = 130_000_000 ;
 
 
 	private Socket socket = null;
@@ -69,7 +70,7 @@ public class ThreadServidor extends Thread {
 			bis = new BufferedInputStream(fis);
 			bis.read(myByteArray, 0, myByteArray.length);
 
-			os =  new BufferedOutputStream(socket.getOutputStream(),130_000_000);
+			os =  new BufferedOutputStream(socket.getOutputStream(),TAM_BUFFER);
 			System.out.println("Sending " + TCPServer.PATH + nombreArchivo + "(" + myByteArray.length + " bytes)");
 
 			int bytesEnviados = 0;
