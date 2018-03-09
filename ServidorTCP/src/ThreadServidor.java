@@ -1,15 +1,9 @@
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class ThreadServidor extends Thread {
 
-	public final static String PATH = "c:/datosRedes/";  //Nombre y ubicación del archivo enviado.
+	// public final static String PATH = "C:\\Users\\Asus-PC\\Desktop\\University\\6Semestre\\Redes\\docs";  //Nombre y ubicación del archivo enviado.
 
 	public final static int MESSAGE_SIZE = 256;  //Tamaño de los paquetes enviados.
 
@@ -69,14 +63,14 @@ public class ThreadServidor extends Thread {
 			//Enviar archivo
 			//File myFile = new File (FILE_TO_SEND);
 
-			File myFile = new File(PATH + nombreArchivo);
+			File myFile = new File(TCPServer.PATH + nombreArchivo);
 			byte [] myByteArray  = new byte [(int)myFile.length()];
 			fis = new FileInputStream(myFile);
 			bis = new BufferedInputStream(fis);
 			bis.read(myByteArray, 0, myByteArray.length);
 
-			os = socket.getOutputStream();
-			System.out.println("Sending " + PATH + nombreArchivo + "(" + myByteArray.length + " bytes)");
+			os =  new BufferedOutputStream(socket.getOutputStream(),130_000_000);
+			System.out.println("Sending " + TCPServer.PATH + nombreArchivo + "(" + myByteArray.length + " bytes)");
 
 			int bytesEnviados = 0;
 
@@ -88,16 +82,18 @@ public class ThreadServidor extends Thread {
 				else {
 					int faltaPorEnviar = myByteArray.length - bytesEnviados;
 					os.write(myByteArray, bytesEnviados, faltaPorEnviar);
-					bytesEnviados += faltaPorEnviar;
+					bytesEnviados += faltaPorEnviar+1;
 				}
-
-
 			}
+			//os.write(myByteArray, bytesEnviados, myByteArray.length);
 
-			//os.write(myByteArray, 0, myByteArray.length);
+			//System.out.println("vamos:"+ bytesEnviados+ " falta:"+ (myByteArray.length - bytesEnviados) );
 			os.flush();
 			System.out.println("Done.");
-
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 		finally {
 			if (bis != null) bis.close();
