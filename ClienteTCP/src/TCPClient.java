@@ -10,17 +10,50 @@ import java.util.Random;
 
 public class TCPClient {
 
-	public final static int SOCKET_PORT = 8080;      // Puerto del socket
+	public final static int SOCKET_PORT = 9000;      // Puerto del socket
 	public final static String SERVER = "127.0.0.1";  // localhost
-	public final static String FILE_TO_RECEIVED = "C:\\Users\\Asus-PC\\Desktop\\University\\6Semestre\\Redes\\docs\\descarga";  // Nombre y lugar descarga archivo.
+	public final static String FILE_TO_RECEIVED = "C:/datosRedes/descarga";  // Nombre y lugar descarga archivo.
+	public final static String DIR_DESCARGA = "C:/carpetaDescargas/";
 	public static int numero=0;
 	public final static int FILE_SIZE = 50000000; // file size temporary hard coded
 	// should bigger than the file to be downloaded
-	
-	public final static int MESSAGE_SIZE = 256;  //Tamaño paquetes
-	
 
-	public static void main (String [] args ) throws IOException {
+	public final static int MESSAGE_SIZE = 256;  //Tamaño paquetes
+
+	private Socket socketPrueba;
+
+
+	public TCPClient() {
+		//conectar();
+
+
+	}
+
+	public boolean conectar() {
+		try {
+			socketPrueba = new Socket(SERVER, SOCKET_PORT);
+			return socketPrueba.isConnected();
+		}
+		catch(Exception e) {
+
+		}
+		return false;
+
+	}
+
+	public boolean desconectar() {
+		try {
+			socketPrueba.close();
+			socketPrueba = null;
+			return true;
+		}
+		catch(Exception e) {
+			return false;
+
+		}
+	}
+
+	public String descargar(String pNombreArchivo) {
 
 		int bytesRead;
 		int current = 0;
@@ -34,25 +67,31 @@ public class TCPClient {
 		String inputLine;
 		String outputLine;
 
+
 		try {
-			socket = new Socket(SERVER, SOCKET_PORT);
+			
+			if(socketPrueba != null) {
+				socketPrueba.close();
+			}
+			
+			socketPrueba = new Socket(SERVER, SOCKET_PORT);
 			System.out.println("Connected.");
 
-			escritor = new PrintWriter(socket.getOutputStream(), true);
-			lector = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-			boolean conexionEstablecida = true;
+			escritor = new PrintWriter(socketPrueba.getOutputStream(), true);
+			lector = new BufferedReader(new InputStreamReader(socketPrueba.getInputStream()));
 
 
-			String mensaje = lector.readLine();
-			System.out.println(mensaje);
+			//String mensaje = lector.readLine();
+			//System.out.println(mensaje);
 
-			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-			String nombreArchivo = stdIn.readLine();
+			//BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+			//String nombreArchivo = stdIn.readLine();
+			
+			String nombreArchivo = pNombreArchivo;
 
 			escritor.println(nombreArchivo);
 			String ext = nombreArchivo.substring(nombreArchivo.lastIndexOf('.'));
-			
+
 			//Iniciar medición tiempo descarga de un archivo.
 			long startTime = System.currentTimeMillis();
 
@@ -60,8 +99,9 @@ public class TCPClient {
 			//Recibir archivo
 
 			byte [] mybytearray  = new byte [FILE_SIZE];
-			InputStream is = socket.getInputStream();
-			fos = new FileOutputStream(FILE_TO_RECEIVED + (numero++)+ext);
+			InputStream is = socketPrueba.getInputStream();
+			//fos = new FileOutputStream(FILE_TO_RECEIVED + (numero++)+ext);
+			fos = new FileOutputStream(DIR_DESCARGA + nombreArchivo);
 
 			bos = new BufferedOutputStream(fos);
 			bytesRead = is.read(mybytearray, 0, mybytearray.length);
@@ -90,17 +130,26 @@ public class TCPClient {
 			bos.write(mybytearray, 0 , current);
 			bos.flush();
 			System.out.println("File " + FILE_TO_RECEIVED + " downloaded (" + current + " bytes read)");
-			
+
 			long endTime = System.currentTimeMillis();
-			
+
 			System.out.println("The download took " + (endTime - startTime) + " milliseconds");
+			
+			escritor.close();
+			lector.close();
+			
+			fos.close();
+			bos.close();
+			return "File " + FILE_TO_RECEIVED + " downloaded (" + current + " bytes read)";
 
 		}
-		finally {
-			if (fos != null) fos.close();
-			if (bos != null) bos.close();
-			if (socket != null) socket.close();
+		catch(Exception e) {
+			
 		}
+
+		return "";
 	}
+
+
 
 }

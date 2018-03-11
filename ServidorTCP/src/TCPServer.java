@@ -11,8 +11,8 @@ import java.net.Socket;
 
 public class TCPServer {
 
-	public final static int SOCKET_PORT = 8080;  //Puerto
-	public final static String PATH = "C:\\Users\\Asus-PC\\Desktop\\University\\6Semestre\\Redes\\docs\\";  //Nombre y ubicación del archivo enviado.
+	public final static int SOCKET_PORT = 9000;  //Puerto
+	public final static String PATH = "C:/datosRedes/";  //Nombre y ubicación del archivo enviado.
 
 	public static void main (String [] args ) throws IOException {
 
